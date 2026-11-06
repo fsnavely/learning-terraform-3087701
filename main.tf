@@ -20,20 +20,6 @@ module "web_vpc" {
   }
 }
 
-
-resource "aws_instance" "web" {
-  ami           = data.aws_ssm_parameter.app_ami.value
-  instance_type = var.instance_type
-
-  vpc_security_group_ids = [resource.aws_security_group.web.id]
-
-  subnet_id = module.web_vpc.public_subnets[0]
-
-  tags = {
-    Name = "HelloWorld"
-  }
-}
-
 resource "aws_security_group" "web" {
   name        = "web"
   description = "Allow http and https in. Allow everything out."
@@ -106,5 +92,28 @@ resource "aws_lb_target_group_attachment" "web" {
   target_group_arn = aws_lb_target_group.web.arn
   target_id        = aws_instance.web.id
   port             = 80
+}
+
+module "web_autoscaling" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "9.3.2"
+
+  name = "web"
+
+  min_size = 1
+  max_size = 1
+
+  vpc_zone_identifier = module.web_vpc.public_subnets
+
+  launch_template_name = "web"
+  security_groups      = [resource.aws_security_group.web.id]
+  instance_type        = var.instance_type
+  image_id             = data.aws_ssm_parameter.app_ami.value
+
+  traffic_source_attachments = {
+    web-alb = {
+      traffic_source_identifier = aws_lb_target_group.web.arn
+    }
+  }
 }
 
