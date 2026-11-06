@@ -1,5 +1,5 @@
 data "aws_ssm_parameter" "app_ami" {
-  name = "/aws/service/ami-amazon-linux-latest/a12023-ami-kernel-default-x86_84"
+  name = "/aws/service/ami-amazon-linux-latest/a12023-ami-kernel-default-x86_64"
 }
 
 resource "aws_instance" "web" {
