@@ -10,23 +10,11 @@ resource "aws_instance" "web" {
   ami           = data.aws_ssm_parameter.app_ami.value
   instance_type = var.instance_type
 
-  vpc_security_group_ids = [module.web_sg.security_group_id]
+  vpc_security_group_ids = [resource.aws_security_group.web.id]
 
   tags = {
     Name = "HelloWorld"
   }
-}
-
-module "web_sg" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "6.0.0"
-  name    = "web_new"
-
-  vpc_id = data.aws_vpc.default.id
-
-  ingress_rules       = ["http-80-tcp","https-443-tcp"]
-
-  egress_rules       = ["all-all"]
 }
 
 resource "aws_security_group" "web" {
