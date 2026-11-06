@@ -1,21 +1,9 @@
-data "aws_ami" "app_ami" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["a12023-ami-2023.*-x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["amazon"]
+data "aws_ssm_parameter" "app_ami" {
+  name = "/aws/service/ami-amazon-linux-latest/a12023-ami-kernel-default-x86_84"
 }
 
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.app_ami.id
+  ami           = data.aws_ssm_parameter.app_ami.value
   instance_type = "t3.nano"
 
   tags = {
