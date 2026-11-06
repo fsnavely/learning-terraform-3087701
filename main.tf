@@ -4,7 +4,7 @@ data "aws_ssm_parameter" "app_ami" {
 
 resource "aws_instance" "web" {
   ami           = data.aws_ssm_parameter.app_ami.value
-  instance_type = "t3.nano"
+  instance_type = var.instance_type
 
   tags = {
     Name = "HelloWorld"
