@@ -1,5 +1,5 @@
 output "instance_ami" {
-  value = aws_instance.web.ami
+  value = nonsensitive(aws_instance.web.ami)
 }
 
 output "instance_arn" {
