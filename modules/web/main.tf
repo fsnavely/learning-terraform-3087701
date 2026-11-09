@@ -21,7 +21,7 @@ module "web_vpc" {
 }
 
 resource "aws_security_group" "web" {
-  name        = "web"
+  name        = "${var.environment.name}-web"
   description = "Allow http and https in. Allow everything out."
 
   vpc_id = module.web_vpc.vpc_id
@@ -60,7 +60,7 @@ resource "aws_security_group_rule" "web_everything_out" {
 module "web_alb" {
   source = "terraform-aws-modules/alb/aws"
 
-  name    = "web-alb"
+  name    = "${var.environment.name}-web-alb"
   vpc_id  = module.web_vpc.vpc_id
   subnets = module.web_vpc.public_subnets
 
@@ -82,7 +82,7 @@ module "web_alb" {
 }
 
 resource "aws_lb_target_group" "web" {
-  name     = "web"
+  name     = "${var.environment.name}-web"
   port     = 80
   protocol = "HTTP"
   vpc_id   = module.web_vpc.vpc_id
@@ -92,20 +92,20 @@ module "web_autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "9.3.2"
 
-  name = "web"
+  name = "${var.environment.name}-web"
 
   min_size = var.min_size
   max_size = var.max_size
 
   vpc_zone_identifier = module.web_vpc.public_subnets
 
-  launch_template_name = "web"
+  launch_template_name = "${var.environment.name}-web"
   security_groups      = [resource.aws_security_group.web.id]
   instance_type        = var.instance_type
   image_id             = data.aws_ssm_parameter.app_ami.value
 
   traffic_source_attachments = {
-    web-alb = {
+    ${var.environment.name}-web-alb = {
       traffic_source_identifier = aws_lb_target_group.web.arn
     }
   }
