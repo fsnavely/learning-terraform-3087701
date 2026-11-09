@@ -3,10 +3,6 @@ variable "instance_type" {
   default     = "t3.nano"
 }
 
-data "aws_ssm_parameter" "app_ami" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
-}
-
 variable "environment" {
   description = "Deployment environment"
   type        = object ({
