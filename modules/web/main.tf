@@ -105,7 +105,7 @@ module "web_autoscaling" {
   image_id             = data.aws_ssm_parameter.app_ami.value
 
   traffic_source_attachments = {
-    ${var.environment.name}-web-alb = {
+    "${var.environment.name}-web-alb" = {
       traffic_source_identifier = aws_lb_target_group.web.arn
     }
   }
